@@ -49,4 +49,15 @@ export class FormComponent implements OnInit {
       }
     );
   }
+  update():void{
+    this.clienteService.update(this.cliente).subscribe(cliente=>{
+      this.router.navigate(['/clientes'])
+     // libreria de alerta
+     swal.fire(
+      "Nuevo actualizado",
+      `Cliente ${cliente.nombre} actualizado con éxito`,
+      "success"
+    );
+    })
+  }
 }
