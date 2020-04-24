@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CLIENTES } from './clientes.json';
+import { formatDate, DatePipe } from '@angular/common';
+///import localeEs from '@angular/common/locales/es';
+// import localeEs from '@angular/common/locales/es-PE';
+// import { CLIENTES } from './clientes.json';
 import { Cliente } from './cliente';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
 @Injectable({
@@ -13,11 +16,34 @@ export class ClienteService {
 	private urlEndPoint: string = 'http://localhost:8080/api/clientes';
 	private httpHeaders = new HttpHeaders({ 'Content-type': 'application/json' });
 	constructor(private http: HttpClient, private router: Router) {}
+
 	//metodo getClientes que retorna los CLIENTES
-	getClientes(): Observable<Cliente[]> {
-		//pipe permite agregar operador como el map
-		return this.http.get(this.urlEndPoint).pipe(map((response) => response as Cliente[]));
+	getClientes(page: number): Observable<any> {
+		return this.http.get(this.urlEndPoint + '/page/' + page).pipe(
+			//pipe permite agregar operador como el map
+			tap((response: any) => {
+				// console.log('ClienteService: tap 1');
+				(response.content as Cliente[]).forEach((cliente) => console.log('cliente.nombre'));
+			}),
+			map((response: any) => {
+				(response.content as Cliente[]).map((cliente) => {
+					//convertir el nombre en mayuscula
+					cliente.nombre = cliente.nombre.toUpperCase();
+					//PONER DIA, MES,AÑO EN ESPAÑOL
+					//let datePipe = new DatePipe('es');
+					//1-cliente.createAt = datePipe.transform(cliente.createAt, 'EEEE dd, MMMM yyyy');
+					//2-cliente.createAt = formatDate(cliente.createAt, 'dd-MM-yyyy', 'es');
+					return cliente;
+				});
+				return response;
+			}),
+			tap((response) => {
+				// console.log('ClienteService: tap 2');
+				(response.content as Cliente[]).forEach((cliente) => console.log('cliente.nombre'));
+			})
+		);
 	}
+
 	//método para crear cliente
 	create(cliente: Cliente): Observable<Cliente> {
 		return this.http
@@ -25,8 +51,11 @@ export class ClienteService {
 				headers: this.httpHeaders
 			})
 			.pipe(
-				map((reponse: any) => reponse.cliente as Cliente),
+				map((response: any) => response.cliente as Cliente),
 				catchError((e) => {
+					if (e.status == 400) {
+						return throwError(e);
+					}
 					console.error(e.error.mensaje);
 					swal.fire(e.error.mensaje, e.error.error, 'error');
 					return throwError(e);
@@ -52,6 +81,9 @@ export class ClienteService {
 			})
 			.pipe(
 				catchError((e) => {
+					if (e.status == 400) {
+						return throwError(e);
+					}
 					console.error(e.error.mensaje);
 					swal.fire(e.error.mensaje, e.error.error, 'error');
 					return throwError(e);
