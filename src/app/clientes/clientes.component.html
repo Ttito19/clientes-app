@@ -1,3 +1,6 @@
+<detalle-cliente *ngIf="clienteSeleccionado" [cliente]="clienteSeleccionado">
+
+</detalle-cliente>
 <div class="card border-primary mb-3">
   <div class="card-header">Clientes</div>
   <div class="card-body text-primary">
@@ -17,7 +20,7 @@
     <table class="table table-bordered table-striped"  *ngIf="clientes?.length>0"  >
       <thead>
         <tr>
-          <th>Id</th>
+          <th>Perfil</th>
           <th>Nombre</th>
           <th>Apellido</th>
           <th>Email</th>
@@ -28,11 +31,22 @@
       </thead>
       <tbody>
         <tr *ngFor="let cliente of clientes">
-          <td>{{ cliente.id }}</td>
+          <td >
+            <!-- cuando hay foto -->
+            <img *ngIf="cliente?.foto" (click)="openModal(cliente)" src="http://localhost:8080/api/uploads/img/{{cliente.foto}}" 
+            
+            alt="{{cliente.foto}}" class="img-thumbnail rounded"  style="width: 50px;cursor: pointer;" >
+        <!-- cuadno no hay foto -->
+            <img *ngIf="!cliente?.foto" (click)="openModal(cliente)" src="http://localhost:8080/images/notUser.png" 
+            
+            alt="Sin foto" class="img-thumbnail rounded"  style="width: 50px;cursor: pointer;" >
+            <!-- <button type="button" (click)="openModal(cliente)"   class="btn btn-success btn-sm"  >{{ cliente.id }}</button> -->
+          
+          </td>
           <td>{{ cliente.nombre }}</td>
           <td>{{ cliente.apellido | uppercase }}</td>
           <td>{{ cliente.email }}</td>
-          <td>{{ cliente.createAt}}</td>
+          <td>{{ cliente.createAt | date:"EEEE dd, MMMM yyyy"}}</td>
           <td>
             <button
               type="button"

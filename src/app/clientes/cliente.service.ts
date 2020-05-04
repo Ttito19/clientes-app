@@ -5,7 +5,7 @@ import { formatDate, DatePipe } from '@angular/common';
 // import { CLIENTES } from './clientes.json';
 import { Cliente } from './cliente';
 import { Observable, of, throwError } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest, HttpEvent } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -27,6 +27,8 @@ export class ClienteService {
 			}),
 			map((response: any) => {
 				(response.content as Cliente[]).map((cliente) => {
+					console.log(response);
+
 					//convertir el nombre en mayuscula
 					cliente.nombre = cliente.nombre.toUpperCase();
 					//PONER DIA, MES,AÑO EN ESPAÑOL
@@ -103,5 +105,18 @@ export class ClienteService {
 					return throwError(e);
 				})
 			);
+	}
+	//metodo uploadFoto
+	subirFoto(archivoFile: File, id): Observable<HttpEvent<{}>> {
+		let formData = new FormData();
+		///archivo debe ir igual por el backend spring boot
+		formData.append('archivo', archivoFile);
+		formData.append('id', id);
+		//barra progresiva
+		const req = new HttpRequest('POST', `${this.urlEndPoint}/upload`, formData, {
+			reportProgress: true
+		});
+		//URL api
+		return this.http.request(req);
 	}
 }

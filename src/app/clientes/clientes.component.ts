@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Cliente } from './cliente';
 import { ClienteService } from './cliente.service';
+import { ModalService } from './detalle/modal.service';
 import Swal from 'sweetalert2';
 import { tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -12,7 +13,12 @@ export class ClientesComponent implements OnInit {
 	//arreglo json con los objetos
 	clientes: Cliente[];
 	paginador: any;
-	constructor(private clienteService: ClienteService, private activatedRoute: ActivatedRoute) {}
+	clienteSeleccionado: Cliente;
+	constructor(
+		private clienteService: ClienteService,
+		private modalService: ModalService,
+		private activatedRoute: ActivatedRoute
+	) {}
 	//este evento es cuando se inicia el componente
 	ngOnInit() {
 		this.activatedRoute.paramMap.subscribe((params) => {
@@ -25,7 +31,7 @@ export class ClientesComponent implements OnInit {
 				.pipe(
 					tap((response) => {
 						// console.log('CLAIENTTE:TAP 3');
-						(response.content as Cliente[]).forEach((cliente) => console.log("cliente.nombre"));
+						(response.content as Cliente[]).forEach((cliente) => console.log('cliente.nombre'));
 						// console.log(response);
 					})
 				)
@@ -34,6 +40,20 @@ export class ClientesComponent implements OnInit {
 					this.paginador = response;
 					// console.log(this.clientes);
 				});
+		});
+		//actualizar la foto al agregar en el listado
+		this.modalService.notificarSubida.subscribe((cliente) => {
+			//map =>nos permite cambiar o modificar algo por cada cliente
+			this.clientes.map((clienteOriginal) => {
+				this.clientes = this.clientes.map((clienteOriginal) => {
+					//si el id del clinte es = al id del cliente orginal
+					if (cliente.id == clienteOriginal.id) {
+						//entonces al cliente original le pasamos la foto actualizada
+						clienteOriginal.foto = cliente.foto;
+					}
+					return clienteOriginal;
+				});
+			});
 		});
 	}
 	//metodo para eliminar
@@ -58,5 +78,9 @@ export class ClientesComponent implements OnInit {
 				Swal.fire('Cancelado!', `Cliente no eliminado`, 'success');
 			}
 		});
+	}
+	openModal(cliente: Cliente) {
+		this.clienteSeleccionado = cliente;
+		this.modalService.openModal();
 	}
 }
