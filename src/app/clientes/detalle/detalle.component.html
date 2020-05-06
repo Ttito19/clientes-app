@@ -19,7 +19,8 @@
                             <li class="list-group-item">{{cliente.apellido}}</li>
                             <li class="list-group-item">{{cliente.email}}</li>
                             <li class="list-group-item">{{cliente.createAt|date:"fullDate"}}</li>
-                        </ul>
+                            <li class="list-group-item">{{cliente.region.nombre}}</li>
+                          </ul>
                      <div class="input-group mb-3">
                          <div class="custom-file" >
                          <input (change)="seleccionarFoto($event)"  type="file" class="custom-file-input" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04"  >

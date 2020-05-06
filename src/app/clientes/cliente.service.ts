@@ -3,6 +3,7 @@ import { formatDate, DatePipe } from '@angular/common';
 ///import localeEs from '@angular/common/locales/es';
 // import localeEs from '@angular/common/locales/es-PE';
 // import { CLIENTES } from './clientes.json';
+import { Region } from './region';
 import { Cliente } from './cliente';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpRequest, HttpEvent } from '@angular/common/http';
@@ -16,7 +17,10 @@ export class ClienteService {
 	private urlEndPoint: string = 'http://localhost:8080/api/clientes';
 	private httpHeaders = new HttpHeaders({ 'Content-type': 'application/json' });
 	constructor(private http: HttpClient, private router: Router) {}
-
+	//método regiones
+	getRegiones(): Observable<Region[]> {
+		return this.http.get<Region[]>(this.urlEndPoint + '/regiones');
+	}
 	//metodo getClientes que retorna los CLIENTES
 	getClientes(page: number): Observable<any> {
 		return this.http.get(this.urlEndPoint + '/page/' + page).pipe(
